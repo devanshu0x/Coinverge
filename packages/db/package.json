@@ -11,13 +11,13 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "@prisma/client": "^6.10.1"
+    "@prisma/client": "^6.10.1",
+    "bcrypt": "^6.0.0"
   },
-  "exports":{
-    "./client":"./src/index.ts"
+  "exports": {
+    "./client": "./src/index.ts"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
   }
-  
 }

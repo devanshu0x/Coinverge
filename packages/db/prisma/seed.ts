@@ -1,13 +1,15 @@
 import { PrismaClient } from "../generated/prisma/index.js"
+import bcrypt from "bcrypt";
 const prisma = new PrismaClient()
 
 async function main() {
+  
   const alice = await prisma.user.upsert({
     where: { number: '9999999999' },
     update: {},
     create: {
       number: '9999999999',
-      password: 'alice',
+      password: await bcrypt.hash('alice',10),
       name: 'alice',
       onRampTransition: {
         create: {
@@ -18,6 +20,12 @@ async function main() {
           provider: "HDFC Bank",
         },
       },
+      balance:{
+        create:{
+          amount:20000,
+          locked:0
+        }
+      }
     },
   })
   const bob = await prisma.user.upsert({
@@ -25,7 +33,7 @@ async function main() {
     update: {},
     create: {
       number: '9999999998',
-      password: 'bob',
+      password: await bcrypt.hash('bob',10),
       name: 'bob',
       onRampTransition: {
         create: {
@@ -36,6 +44,12 @@ async function main() {
           provider: "HDFC Bank",
         },
       },
+      balance:{
+        create:{
+          amount: 0,
+          locked: 0,
+        }
+      }
     },
   })
   console.log({ alice, bob })
