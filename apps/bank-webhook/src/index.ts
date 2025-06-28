@@ -23,7 +23,7 @@ app.post("/hdfcWebhook", async (req,res)=>{
         }
     }),
 
-    prisma.onRampTransition.update({
+    prisma.onRampTransaction.update({
         where:{
             token:paymentInformation.token
         },
