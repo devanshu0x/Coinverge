@@ -3,29 +3,56 @@ import { OnRampTransactions } from '../../../components/onRampTransaction'
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../../lib/auth';
 import { prisma } from '@repo/db/client';
+import { timeStamp } from 'console';
+import { P2pTransactions } from '../../../components/p2pTransactions';
 
 
-async function getOnRampTransactions() {
-    const session = await getServerSession(authOptions);
-    const txns = await prisma.onRampTransaction.findMany({
-        where: {
-            userId: Number(session?.user?.id)
+
+
+async function getP2PTransaction(){
+  const session= await getServerSession(authOptions);
+  const sent=await prisma.p2PTransfer.findMany({
+    where:{
+      fromUserId:Number(session.user.id)
+    },
+    select:{
+      amount:true,
+      timestamp:true,
+      toUser:{
+        select:{
+          name:true,
+          number:true
         }
-    });
-    return txns.map(t => ({
-        time: t.startTime,
-        amount: t.amount,
-        status: t.status,
-        provider: t.provider
-    }))
+      }
+    }
+  })
+
+  const received=await prisma.p2PTransfer.findMany({
+    where:{
+      toUserId: Number(session.user.id)
+    },
+    select:{
+      amount:true,
+      timestamp:true,
+      fromUser:{
+        select:{
+          name:true,
+          number:true
+        }
+      }
+    }
+
+  })
+
+  return {sent,received};
 }
 
 export default async function() {
-  const transactions=await getOnRampTransactions();
+  const p2p=await getP2PTransaction()
   return (
     <div className='w-full h-screen flex gap-10 justify-center items-center'>
-      <OnRampTransactions transactions={transactions}/>
-      
+      <P2pTransactions title='Sent' txn={p2p.sent} />
+      <P2pTransactions title='Received' txn={p2p.received} />
     </div>
   )
 }
